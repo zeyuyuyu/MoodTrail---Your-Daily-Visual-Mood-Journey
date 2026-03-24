@@ -4,165 +4,110 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MoodTrail - Your Daily Visual Mood Journey</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body {
-            font-family: 'Poppins', sans-serif;
-            background: #1a1a1a;
-            color: #fff;
-        }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        .mood-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-            gap: 10px;
-            margin-top: 20px;
-        }
-        .mood-tile {
-            aspect-ratio: 1;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: transform 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-        .mood-tile:hover {
-            transform: scale(1.05);
-        }
-        .streak-banner {
-            background: linear-gradient(45deg, #FF6B6B, #4ECDC4);
-            padding: 15px;
-            border-radius: 15px;
-            text-align: center;
-            margin-bottom: 20px;
-            animation: pulse 2s infinite;
-        }
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.02); }
-            100% { transform: scale(1); }
-        }
-        .share-container {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: linear-gradient(45deg, #FF6B6B, #4ECDC4);
-            padding: 15px;
-            border-radius: 25px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-        }
-        .achievement-popup {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(255,255,255,0.95);
-            padding: 20px;
-            border-radius: 15px;
-            text-align: center;
-            color: #1a1a1a;
-            display: none;
-            z-index: 1000;
-            animation: popIn 0.5s ease;
-        }
-        @keyframes popIn {
-            from { transform: translate(-50%, -50%) scale(0); }
-            to { transform: translate(-50%, -50%) scale(1); }
-        }
-        .mood-stats {
-            display: flex;
-            justify-content: space-around;
-            margin: 20px 0;
-            flex-wrap: wrap;
-        }
-        .stat-card {
-            background: rgba(255,255,255,0.1);
-            padding: 15px;
-            border-radius: 10px;
-            text-align: center;
-            min-width: 150px;
-            margin: 10px;
-        }
-    </style>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
 </head>
-<body>
-    <div class="container">
-        <div class="streak-banner">
-            <h2>🔥 5 Day Streak! Keep it up!</h2>
-            <p>Share your streak to get bonus points!</p>
-        </div>
+<body class="bg-gradient-to-br from-purple-500 to-pink-500 min-h-screen">
+    <div id="app" class="container mx-auto px-4 py-8">
+        <h1 class="text-4xl font-bold text-white text-center mb-8 animate__animated animate__fadeIn">MoodTrail ✨</h1>
         
-        <div class="mood-stats">
-            <div class="stat-card">
-                <h3>Mood Score</h3>
-                <p>87/100</p>
+        <!-- Mood Input Section -->
+        <div class="bg-white rounded-lg p-6 shadow-lg mb-8 animate__animated animate__fadeInUp">
+            <div class="mood-slider mb-6">
+                <label class="block text-lg font-medium mb-2">How are you feeling right now?</label>
+                <input type="range" min="1" max="10" class="w-full h-4 rounded-lg appearance-none bg-gradient-to-r from-red-500 via-yellow-500 to-green-500">
+                <div class="flex justify-between text-sm text-gray-600 mt-1">
+                    <span>😢</span>
+                    <span>😐</span>
+                    <span>😊</span>
+                </div>
             </div>
-            <div class="stat-card">
-                <h3>Streak</h3>
-                <p>5 days</p>
+            
+            <!-- AI-Powered Mood Analysis -->
+            <div class="mb-6">
+                <textarea placeholder="What's on your mind? (Optional)" class="w-full p-3 border rounded-lg resize-none h-24"></textarea>
+                <button id="analyzeBtn" class="mt-2 bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition">Analyze My Mood</button>
             </div>
-            <div class="stat-card">
-                <h3>Rank</h3>
-                <p>#234 in your city</p>
+
+            <!-- Social Sharing Section -->
+            <div class="flex flex-wrap gap-4 justify-center">
+                <button class="share-btn bg-blue-500 text-white px-6 py-2 rounded-full hover:bg-blue-600 transition flex items-center">
+                    <span class="mr-2">Share My Mood</span> 🌟
+                </button>
+                <button class="challenge-btn bg-pink-500 text-white px-6 py-2 rounded-full hover:bg-pink-600 transition flex items-center">
+                    <span class="mr-2">Start Mood Challenge</span> 🎯
+                </button>
             </div>
         </div>
 
-        <div class="mood-grid" id="moodGrid"></div>
+        <!-- Mood Streaks & Achievements -->
+        <div class="grid md:grid-cols-2 gap-6 mb-8">
+            <div class="bg-white rounded-lg p-6 shadow-lg animate__animated animate__fadeInLeft">
+                <h3 class="text-xl font-bold mb-4">Your Mood Streak 🔥</h3>
+                <div class="text-4xl font-bold text-center text-indigo-600">7 Days</div>
+                <div class="text-center text-gray-600 mt-2">Keep going! You're doing great!</div>
+            </div>
+            <div class="bg-white rounded-lg p-6 shadow-lg animate__animated animate__fadeInRight">
+                <h3 class="text-xl font-bold mb-4">Achievements 🏆</h3>
+                <div class="grid grid-cols-3 gap-4 text-center">
+                    <div class="achievement">🌟</div>
+                    <div class="achievement">💎</div>
+                    <div class="achievement">👑</div>
+                </div>
+            </div>
+        </div>
 
-        <div class="share-container">
-            <button onclick="shareAchievement()">📱 Share Your Mood Journey</button>
+        <!-- Community Feed -->
+        <div class="bg-white rounded-lg p-6 shadow-lg animate__animated animate__fadeInUp">
+            <h3 class="text-xl font-bold mb-4">Community Vibes ❤️</h3>
+            <div class="space-y-4">
+                <div class="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg">
+                    <img src="https://source.unsplash.com/random/40x40" class="rounded-full">
+                    <div>
+                        <div class="font-medium">Sarah J.</div>
+                        <div class="text-gray-600">Feeling amazing after meditation! 🧘‍♀️</div>
+                    </div>
+                    <button class="ml-auto text-pink-500 hover:text-pink-600">❤️ 42</button>
+                </div>
+                <div class="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg">
+                    <img src="https://source.unsplash.com/random/40x40" class="rounded-full">
+                    <div>
+                        <div class="font-medium">Mike R.</div>
+                        <div class="text-gray-600">Completed my 30-day happiness challenge! 🎉</div>
+                    </div>
+                    <button class="ml-auto text-pink-500 hover:text-pink-600">❤️ 89</button>
+                </div>
+            </div>
         </div>
     </div>
 
-    <div class="achievement-popup" id="achievementPopup">
-        <h2>🎉 Achievement Unlocked!</h2>
-        <p>"Mood Master" - Track your mood for 5 days straight</p>
-        <button onclick="closePopup()">Claim 500 Points</button>
+    <!-- Gamification Pop-ups -->
+    <div id="achievementPopup" class="fixed bottom-4 right-4 bg-white p-4 rounded-lg shadow-lg hidden animate__animated animate__bounceIn">
+        <div class="text-lg font-bold">🎉 New Achievement Unlocked!</div>
+        <div class="text-gray-600">"Mood Master" - Track your mood for 7 days straight</div>
     </div>
 
     <script>
-        // Generate mood tiles with random gradients
-        const moodGrid = document.getElementById('moodGrid');
-        const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEEAD', '#D4A5A5'];
+        // Gamification Features
+        document.querySelector('#analyzeBtn').addEventListener('click', () => {
+            setTimeout(() => {
+                document.querySelector('#achievementPopup').classList.remove('hidden');
+                setTimeout(() => {
+                    document.querySelector('#achievementPopup').classList.add('hidden');
+                }, 3000);
+            }, 1000);
+        });
 
-        for (let i = 0; i < 30; i++) {
-            const tile = document.createElement('div');
-            tile.className = 'mood-tile';
-            const color1 = colors[Math.floor(Math.random() * colors.length)];
-            const color2 = colors[Math.floor(Math.random() * colors.length)];
-            tile.style.background = `linear-gradient(45deg, ${color1}, ${color2})`;
-            tile.addEventListener('click', () => showAchievement());
-            moodGrid.appendChild(tile);
-        }
+        // Social Features
+        document.querySelector('.share-btn').addEventListener('click', () => {
+            // Implement social sharing
+            alert('Share your mood journey with friends! 🌟');
+        });
 
-        // Gamification features
-        function showAchievement() {
-            const popup = document.getElementById('achievementPopup');
-            popup.style.display = 'block';
-        }
-
-        function closePopup() {
-            const popup = document.getElementById('achievementPopup');
-            popup.style.display = 'none';
-        }
-
-        function shareAchievement() {
-            if (navigator.share) {
-                navigator.share({
-                    title: 'My MoodTrail Journey',
-                    text: '🎉 I'm on a 5-day mood tracking streak! Join me on MoodTrail and let\'s track our mental wellness together! 🌟',
-                    url: window.location.href
-                });
-            }
-        }
-
-        // Show achievement popup after 3 seconds
-        setTimeout(showAchievement, 3000);
+        // Mood Challenges
+        document.querySelector('.challenge-btn').addEventListener('click', () => {
+            alert('Join the 30-day Happiness Challenge! 🎯');
+        });
     </script>
 </body>
 </html>
