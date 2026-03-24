@@ -3,199 +3,166 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MoodTrail - Track Your Emotional Journey</title>
+    <title>MoodTrail - Your Daily Visual Mood Journey</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
     <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
-            margin: 0;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto;
-            background: #fafafa;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            font-family: 'Poppins', sans-serif;
+            background: #1a1a1a;
+            color: #fff;
         }
-
-        .header {
-            width: 100%;
-            padding: 1rem;
-            background: white;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            text-align: center;
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
         }
-
-        .mood-wheel {
-            margin: 2rem 0;
+        .mood-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .mood-tile {
+            aspect-ratio: 1;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
             position: relative;
-            width: 300px;
-            height: 300px;
+            overflow: hidden;
         }
-
-        #wheelCanvas {
-            border-radius: 50%;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            cursor: pointer;
-            transition: transform 0.3s;
+        .mood-tile:hover {
+            transform: scale(1.05);
         }
-
-        #wheelCanvas:hover {
-            transform: scale(1.02);
+        .streak-banner {
+            background: linear-gradient(45deg, #FF6B6B, #4ECDC4);
+            padding: 15px;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 20px;
+            animation: pulse 2s infinite;
         }
-
-        .mood-input {
-            margin: 1rem;
-            padding: 1rem;
-            width: 80%;
-            max-width: 500px;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
         }
-
-        .mood-note {
-            width: 100%;
-            padding: 0.5rem;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            margin-bottom: 1rem;
+        .share-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: linear-gradient(45deg, #FF6B6B, #4ECDC4);
+            padding: 15px;
+            border-radius: 25px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
-
-        .save-btn {
-            background: #5c6bc0;
-            color: white;
-            border: none;
-            padding: 0.5rem 1rem;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: background 0.3s;
+        .achievement-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255,255,255,0.95);
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            color: #1a1a1a;
+            display: none;
+            z-index: 1000;
+            animation: popIn 0.5s ease;
         }
-
-        .save-btn:hover {
-            background: #3f51b5;
+        @keyframes popIn {
+            from { transform: translate(-50%, -50%) scale(0); }
+            to { transform: translate(-50%, -50%) scale(1); }
         }
-
-        .trail-container {
-            width: 80%;
-            max-width: 800px;
-            margin: 2rem 0;
-            padding: 1rem;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        .mood-stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        .stat-card {
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            min-width: 150px;
+            margin: 10px;
         }
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1>MoodTrail</h1>
-        <p>Track your emotional journey with colors</p>
+    <div class="container">
+        <div class="streak-banner">
+            <h2>🔥 5 Day Streak! Keep it up!</h2>
+            <p>Share your streak to get bonus points!</p>
+        </div>
+        
+        <div class="mood-stats">
+            <div class="stat-card">
+                <h3>Mood Score</h3>
+                <p>87/100</p>
+            </div>
+            <div class="stat-card">
+                <h3>Streak</h3>
+                <p>5 days</p>
+            </div>
+            <div class="stat-card">
+                <h3>Rank</h3>
+                <p>#234 in your city</p>
+            </div>
+        </div>
+
+        <div class="mood-grid" id="moodGrid"></div>
+
+        <div class="share-container">
+            <button onclick="shareAchievement()">📱 Share Your Mood Journey</button>
+        </div>
     </div>
 
-    <div class="mood-wheel">
-        <canvas id="wheelCanvas" width="300" height="300"></canvas>
-    </div>
-
-    <div class="mood-input">
-        <textarea class="mood-note" placeholder="How are you feeling today?"></textarea>
-        <button class="save-btn">Save Mood</button>
-    </div>
-
-    <div class="trail-container">
-        <h2>Your Mood Trail</h2>
-        <canvas id="trailCanvas" width="800" height="200"></canvas>
+    <div class="achievement-popup" id="achievementPopup">
+        <h2>🎉 Achievement Unlocked!</h2>
+        <p>"Mood Master" - Track your mood for 5 days straight</p>
+        <button onclick="closePopup()">Claim 500 Points</button>
     </div>
 
     <script>
-        class MoodTrail {
-            constructor() {
-                this.wheelCanvas = document.getElementById('wheelCanvas');
-                this.trailCanvas = document.getElementById('trailCanvas');
-                this.wheelCtx = this.wheelCanvas.getContext('2d');
-                this.trailCtx = this.trailCanvas.getContext('2d');
-                this.selectedColor = null;
-                this.moodHistory = JSON.parse(localStorage.getItem('moodHistory') || '[]');
+        // Generate mood tiles with random gradients
+        const moodGrid = document.getElementById('moodGrid');
+        const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEEAD', '#D4A5A5'];
 
-                this.initWheel();
-                this.initTrail();
-                this.bindEvents();
-            }
+        for (let i = 0; i < 30; i++) {
+            const tile = document.createElement('div');
+            tile.className = 'mood-tile';
+            const color1 = colors[Math.floor(Math.random() * colors.length)];
+            const color2 = colors[Math.floor(Math.random() * colors.length)];
+            tile.style.background = `linear-gradient(45deg, ${color1}, ${color2})`;
+            tile.addEventListener('click', () => showAchievement());
+            moodGrid.appendChild(tile);
+        }
 
-            initWheel() {
-                const centerX = this.wheelCanvas.width / 2;
-                const centerY = this.wheelCanvas.height / 2;
-                const radius = 140;
+        // Gamification features
+        function showAchievement() {
+            const popup = document.getElementById('achievementPopup');
+            popup.style.display = 'block';
+        }
 
-                for(let angle = 0; angle < 360; angle++) {
-                    const startAngle = (angle - 2) * Math.PI / 180;
-                    const endAngle = (angle + 2) * Math.PI / 180;
+        function closePopup() {
+            const popup = document.getElementById('achievementPopup');
+            popup.style.display = 'none';
+        }
 
-                    this.wheelCtx.beginPath();
-                    this.wheelCtx.moveTo(centerX, centerY);
-                    this.wheelCtx.arc(centerX, centerY, radius, startAngle, endAngle);
-                    this.wheelCtx.closePath();
-
-                    const hue = angle;
-                    this.wheelCtx.fillStyle = `hsl(${hue}, 70%, 60%)`;
-                    this.wheelCtx.fill();
-                }
-            }
-
-            initTrail() {
-                this.trailCtx.clearRect(0, 0, this.trailCanvas.width, this.trailCanvas.height);
-                
-                const spacing = this.trailCanvas.width / Math.max(20, this.moodHistory.length);
-                
-                this.moodHistory.forEach((mood, index) => {
-                    this.trailCtx.beginPath();
-                    this.trailCtx.arc(index * spacing, 100, 10, 0, Math.PI * 2);
-                    this.trailCtx.fillStyle = mood.color;
-                    this.trailCtx.fill();
+        function shareAchievement() {
+            if (navigator.share) {
+                navigator.share({
+                    title: 'My MoodTrail Journey',
+                    text: '🎉 I'm on a 5-day mood tracking streak! Join me on MoodTrail and let\'s track our mental wellness together! 🌟',
+                    url: window.location.href
                 });
-            }
-
-            bindEvents() {
-                this.wheelCanvas.addEventListener('click', (e) => {
-                    const rect = this.wheelCanvas.getBoundingClientRect();
-                    const x = e.clientX - rect.left;
-                    const y = e.clientY - rect.top;
-                    const centerX = this.wheelCanvas.width / 2;
-                    const centerY = this.wheelCanvas.height / 2;
-
-                    const angle = Math.atan2(y - centerY, x - centerX);
-                    const hue = ((angle + Math.PI) / (Math.PI * 2)) * 360;
-
-                    this.selectedColor = `hsl(${hue}, 70%, 60%)`;
-                    this.highlightSelection(x, y);
-                });
-
-                document.querySelector('.save-btn').addEventListener('click', () => {
-                    if (!this.selectedColor) return;
-
-                    const note = document.querySelector('.mood-note').value;
-                    this.moodHistory.push({
-                        color: this.selectedColor,
-                        note: note,
-                        timestamp: new Date().toISOString()
-                    });
-
-                    localStorage.setItem('moodHistory', JSON.stringify(this.moodHistory));
-                    this.initTrail();
-                    document.querySelector('.mood-note').value = '';
-                });
-            }
-
-            highlightSelection(x, y) {
-                this.initWheel();
-                this.wheelCtx.beginPath();
-                this.wheelCtx.arc(x, y, 10, 0, Math.PI * 2);
-                this.wheelCtx.fillStyle = 'white';
-                this.wheelCtx.fill();
-                this.wheelCtx.beginPath();
-                this.wheelCtx.arc(x, y, 8, 0, Math.PI * 2);
-                this.wheelCtx.fillStyle = this.selectedColor;
-                this.wheelCtx.fill();
             }
         }
 
-        new MoodTrail();
+        // Show achievement popup after 3 seconds
+        setTimeout(showAchievement, 3000);
     </script>
 </body>
 </html>
